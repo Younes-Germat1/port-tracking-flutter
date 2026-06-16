@@ -1,56 +1,52 @@
-# 🚢 Port Tracking — Flutter Mobile App
-
-> Système de suivi portuaire — Application Mobile Android/iOS
-> Built with Flutter + Dart, connected to Spring Boot backend
+# Port Tracking — Flutter Mobile App 🚢
+Système de Suivi Portuaire — Application Mobile Android/iOS  
+Built with Flutter + Dart, connected to Spring Boot backend
 
 ---
 
 ## 📋 Table des Matières
-
-- [Aperçu](#aperçu)
-- [Technologies Utilisées](#technologies-utilisées)
-- [Prérequis](#prérequis)
-- [Installation](#installation)
-- [Configuration](#configuration)
-- [Connexion avec le Backend Spring Boot](#connexion-avec-le-backend)
-- [Structure du Projet](#structure-du-projet)
-- [Rôles & Accès](#rôles--accès)
-- [Lancer l'Application](#lancer-lapplication)
-- [Build APK](#build-apk)
+1. Aperçu
+2. Technologies Utilisées
+3. Prérequis
+4. Installation
+5. Configuration
+6. Structure du Projet
+7. Rôles & Accès
+8. Fonctionnalités
+9. Lancer l'Application
+10. Build APK
 
 ---
 
 ## 📌 Aperçu
-
-Application mobile Flutter pour le suivi portuaire. Permet aux différents acteurs (Importateur, ADII, Opérateur, Inspecteur, Admin) de gérer les fiches suiveuses, conteneurs et inspections depuis leur smartphone.
+Application mobile Flutter pour le suivi portuaire PORTNET.  
+Permet aux inspecteurs et autres acteurs de gérer les inspections, scanner les QR codes des conteneurs et recevoir des notifications en temps réel.
 
 ---
 
 ## 🛠 Technologies Utilisées
-
 | Technologie | Version | Rôle |
 |---|---|---|
 | Flutter | 3.x | Framework mobile |
 | Dart | 3.x | Langage |
-| Dio | ^5.4.0 | HTTP Client (comme Axios) |
+| Dio | ^5.4.0 | HTTP Client |
 | Provider | ^6.1.1 | State Management |
 | GoRouter | ^13.0.0 | Navigation |
 | flutter_secure_storage | ^9.0.0 | Stockage JWT token |
-| jwt_decoder | ^2.0.1 | Décodage token |
+| mobile_scanner | ^5.0.0 | Scanner QR Code |
+| image_picker | ^1.0.7 | Photos comme preuve |
 | qr_flutter | ^4.1.0 | Affichage QR Code |
 | shimmer | ^3.0.0 | Loading animations |
 
 ---
 
 ## ✅ Prérequis
+- Flutter SDK 3.0+
+- Android Studio
+- Dart SDK 3.0+
+- Spring Boot Backend démarré sur port 8080
+- MySQL avec base `port_tracking`
 
-- **Flutter SDK** 3.0+ → [flutter.dev](https://flutter.dev/docs/get-started/install)
-- **Android Studio** avec émulateur Android (API 26+)
-- **Dart SDK** 3.0+
-- **Spring Boot Backend** démarré sur port `8080`
-- **MySQL** avec base `port_tracking`
-
-Vérifier l'installation Flutter:
 ```bash
 flutter doctor
 ```
@@ -60,266 +56,242 @@ flutter doctor
 ## 🚀 Installation
 
 ### 1. Cloner le projet
-
 ```bash
-git clone https://github.com/votre-repo/port-tracking-flutter.git
+git clone https://github.com/Younes-Germat1/port-tracking-flutter.git
 cd port-tracking-flutter
 ```
 
 ### 2. Installer les dépendances
-
 ```bash
 flutter pub get
-```
-
-### 3. Créer les dossiers (si pas déjà fait)
-
-```powershell
-New-Item -ItemType Directory -Force -Path lib/core, lib/models, lib/services, lib/providers, lib/screens/auth, lib/screens/dashboard, lib/screens/fiches, lib/screens/conteneurs, lib/screens/inspections, lib/screens/notifications, lib/screens/admin, lib/widgets, lib/router, lib/utils
 ```
 
 ---
 
 ## ⚙️ Configuration
 
-### IP du Backend selon l'environnement
-
-Modifier `lib/core/constants.dart`:
+### IP du Backend
+Modifier `lib/core/constants.dart` :
 
 ```dart
 class AppConstants {
-  // Pour émulateur Android → utiliser 10.0.2.2
-  static const String baseUrl = 'http://10.0.2.2:8080';
-
   // Pour appareil réel → utiliser l'IP de votre PC
-  // static const String baseUrl = 'http://192.168.1.x:8080';
+  static const String baseUrl = 'http://192.168.X.X:8080';
 
-  // Pour iOS Simulator → utiliser localhost
+  // Pour émulateur Android
+  // static const String baseUrl = 'http://10.0.2.2:8080';
+
+  // Pour iOS Simulator
   // static const String baseUrl = 'http://localhost:8080';
 }
 ```
 
-### Trouver l'IP de votre PC (appareil réel)
-
-```bash
+### Trouver l'IP de votre PC
+```powershell
 # Windows
 ipconfig
-# Chercher: IPv4 Address → ex: 192.168.1.5
-
-# Mac/Linux
-ifconfig | grep inet
+# Chercher: Carte réseau sans fil Wi-Fi → Adresse IPv4
 ```
 
----
+> ⚠️ Le téléphone et le PC doivent être sur le même réseau WiFi !
 
-## 🔗 Connexion avec le Backend
-
-### Flow d'Authentification
-
+### Ouvrir le firewall Windows
+```powershell
+# En tant qu'Administrateur
+netsh advfirewall firewall add rule name="Spring Boot 8080" dir=in action=allow protocol=TCP localport=8080 profile=any
 ```
-Flutter App → POST /api/auth/login → Spring Boot
-           ← { id, token, role, email, nom }
-           → Stocke token dans SecureStorage
-           → Toutes les requêtes incluent: Authorization: Bearer <token>
-```
-
-### Configuration Dio (`lib/core/api_client.dart`)
-
-```dart
-static Dio _createDio() {
-  final dio = Dio(BaseOptions(
-    baseUrl: AppConstants.baseUrl,  // http://10.0.2.2:8080
-    connectTimeout: Duration(seconds: 10),
-  ));
-
-  // Intercepteur JWT automatique
-  dio.interceptors.add(InterceptorsWrapper(
-    onRequest: (options, handler) async {
-      final token = await AuthStorage.getToken();
-      if (token != null) {
-        options.headers['Authorization'] = 'Bearer $token';
-      }
-      return handler.next(options);
-    },
-  ));
-  return dio;
-}
-```
-
-### Endpoints Backend Utilisés
-
-| Méthode | Endpoint | Service Flutter |
-|---|---|---|
-| POST | `/api/auth/login` | `AuthService.login()` |
-| GET | `/api/fiches` | `FicheService.getAllFiches()` |
-| POST | `/api/fiches` | `FicheService.createFiche()` |
-| PUT | `/api/fiches/{id}/statut` | `FicheService.updateStatut()` |
-| GET | `/api/conteneurs/fiche/{id}` | `ConteneurService.getConteneursByFiche()` |
-| POST | `/api/conteneurs` | `ConteneurService.createConteneur()` |
-| PUT | `/api/conteneurs/{id}/emplacement` | `ConteneurService.assignEmplacement()` |
-| GET | `/api/inspections` | `InspectionService.getAllInspections()` |
-| GET | `/api/inspections/mes-taches` | `InspectionService.getMesTaches()` |
-| POST | `/api/inspections` | `InspectionService.createInspection()` |
-| PUT | `/api/inspections/{id}/resultat` | `InspectionService.enregistrerResultat()` |
-| GET | `/api/notifications/me` | `NotificationService.getMyNotifications()` |
-| PUT | `/api/notifications/{id}/lu` | `NotificationService.markAsRead()` |
-| GET | `/api/admin/users` | `UserService.getAllUsers()` |
 
 ---
 
 ## 📁 Structure du Projet
-
-```
 port_tracking_flutter/
+
 ├── lib/
+
 │   ├── core/
+
 │   │   ├── constants.dart        # baseUrl, roles, statuts
+
 │   │   ├── api_client.dart       # Dio + JWT interceptor
+
 │   │   └── auth_storage.dart     # SecureStorage token
+
 │   ├── models/
+
 │   │   ├── user.dart
+
 │   │   ├── fiche.dart
+
 │   │   ├── conteneur.dart
+
 │   │   ├── inspection.dart
+
 │   │   ├── notification.dart
+
 │   │   └── document.dart
+
 │   ├── services/
+
 │   │   ├── auth_service.dart
+
 │   │   ├── fiche_service.dart
+
 │   │   ├── conteneur_service.dart
+
 │   │   ├── inspection_service.dart
+
 │   │   ├── notification_service.dart
+
 │   │   └── user_service.dart
+
 │   ├── providers/
-│   │   ├── auth_provider.dart       # Login, logout, user state
-│   │   ├── fiche_provider.dart      # Fiches list + filters
-│   │   └── notification_provider.dart # Unread count + polling
+
+│   │   ├── auth_provider.dart
+
+│   │   ├── fiche_provider.dart
+
+│   │   └── notification_provider.dart
+
 │   ├── screens/
+
 │   │   ├── auth/
-│   │   │   └── login_screen.dart
+
+│   │   │   └── login_screen.dart       # Glassmorphism UI
+
 │   │   ├── dashboard/
-│   │   │   └── dashboard_screen.dart
+
+│   │   │   └── dashboard_screen.dart   # Stats cliquables
+
 │   │   ├── fiches/
+
 │   │   │   ├── fiche_list_screen.dart
+
 │   │   │   ├── fiche_detail_screen.dart
+
 │   │   │   └── create_fiche_screen.dart
+
 │   │   ├── conteneurs/
+
 │   │   │   ├── conteneur_list_screen.dart
+
 │   │   │   └── conteneur_detail_screen.dart
+
 │   │   ├── inspections/
-│   │   │   └── inspection_list_screen.dart
+
+│   │   │   ├── inspection_list_screen.dart
+
+│   │   │   └── inspection_detail_screen.dart  # Photos comme preuve
+
 │   │   ├── notifications/
+
 │   │   │   └── notification_list_screen.dart
-│   │   └── admin/
-│   │       └── user_management_screen.dart
+
+│   │   ├── admin/
+
+│   │   │   └── user_management_screen.dart
+
+│   │   └── qr/
+
+│   │       └── qr_scanner_screen.dart   # Scanner futuriste
+
 │   ├── widgets/
-│   │   ├── app_drawer.dart          # Side menu by role
-│   │   ├── statut_badge.dart        # Colored status chip
-│   │   └── notification_bell.dart   # Bell with red badge
+
+│   │   ├── app_drawer.dart
+
+│   │   └── statut_badge.dart
+
 │   ├── router/
-│   │   └── app_router.dart          # GoRouter + role guards
-│   ├── utils/
-│   │   ├── date_formatter.dart
-│   │   └── role_helper.dart
-│   └── main.dart                    # App entry point
+
+│   │   └── app_router.dart
+
+│   └── main.dart
+
+├── assets/
+
+│   └── images/
+
+│       └── Portnet-removebg-preview.png
+
 ├── android/
+
 ├── ios/
+
 ├── pubspec.yaml
+
 └── README.md
-```
 
 ---
 
 ## 👥 Rôles & Accès
-
 | Rôle | Email | Password | Pages Accessibles |
 |---|---|---|---|
-| **ADMIN** | admin@port.ma | 123456 | Tout + Utilisateurs |
-| **IMPORTATEUR** | importateur@port.ma | 123456 | Dashboard, Fiches, Notifications |
-| **ADII** | adii@port.ma | 123456 | Dashboard, Fiches, Conteneurs, Inspections |
-| **OPERATEUR** | operateur@port.ma | 123456 | Dashboard, Fiches, Conteneurs |
-| **INSPECTEUR** | inspecteur@port.ma | 123456 | Dashboard, Inspections, Notifications |
+| ADMIN | admin@port.ma | 123456 | Tout + Utilisateurs |
+| IMPORTATEUR | importateur@port.ma | 123456 | Dashboard, Fiches, Notifications |
+| ADII | adii@port.ma | 123456 | Dashboard, Fiches, Conteneurs, Inspections |
+| OPERATEUR | operateur@port.ma | 123456 | Dashboard, Fiches, Conteneurs |
+| INSPECTEUR | inspecteur@port.ma | 123456 | Dashboard, Inspections, Scanner QR, Notifications |
+
+---
+
+## ✨ Fonctionnalités
+- ✅ **Login sécurisé** avec JWT — UI glassmorphism PORTNET
+- ✅ **Dashboard** avec statistiques cliquables par rôle
+- ✅ **Scanner QR Code** futuriste pour les inspecteurs
+- ✅ **Inspections** — voir, enregistrer résultats (Conforme/Non Conforme)
+- ✅ **Photos comme preuve** d'inspection (caméra + galerie)
+- ✅ **Notifications** en temps réel avec polling
+- ✅ **Fiches Suiveuses** — créer, approuver, rejeter
+- ✅ **Conteneurs** — suivi emplacement et statut
+- ✅ **Gestion utilisateurs** (Admin)
 
 ---
 
 ## ▶️ Lancer l'Application
 
-### 1. Démarrer le backend Spring Boot
+### Ordre à respecter :
 ```bash
-# Dans IntelliJ → Run PortTrackingBackendApplication
-# Vérifier: Tomcat started on port(s): 8080
-```
-
-### 2. Démarrer l'émulateur Android
-```bash
-# Android Studio → Device Manager → Start Emulator
-# OU
-flutter emulators --launch <emulator_id>
-```
-
-### 3. Lancer l'app Flutter
-```bash
+# 1. Démarrer MySQL
+# 2. Démarrer Spring Boot (IntelliJ → Run)
+# 3. Connecter le téléphone Android en USB
+# 4. Lancer Flutter
 flutter run
 ```
 
-### Hot Reload (pendant le développement)
-```bash
+### Hot Reload
 r  # Hot reload
+
 R  # Hot restart
+
 q  # Quit
-```
 
 ---
 
 ## 📦 Build APK
 
-### Debug APK (pour tests)
 ```bash
+# Debug
 flutter build apk --debug
-# Output: build/app/outputs/flutter-apk/app-debug.apk
-```
 
-### Release APK (pour production/PFE demo)
-```bash
+# Release
 flutter build apk --release
-# Output: build/app/outputs/flutter-apk/app-release.apk
-```
-
-### Install directement sur appareil connecté
-```bash
-flutter install
-```
-
----
-
-## 🔧 Démarrage Complet
-
-```
-Ordre à respecter:
-1. Démarrer MySQL
-2. Démarrer Spring Boot (port 8080)
-3. Démarrer émulateur Android
-4. flutter run
-5. Login: importateur@port.ma / 123456
 ```
 
 ---
 
 ## 🐛 Problèmes Connus & Solutions
-
 | Problème | Solution |
 |---|---|
-| `Connection refused` | Vérifier Spring Boot est démarré |
-| `403 Forbidden` | Token expiré → se reconnecter |
-| `10.0.2.2` ne marche pas | Utiliser l'IP réelle du PC sur appareil physique |
-| Écran noir au démarrage | `flutter clean && flutter pub get` |
-| `file_picker` error | Déjà retiré du pubspec.yaml |
+| Serveur inaccessible | Vérifier IP dans `constants.dart` + même WiFi |
+| 403 Forbidden | Token expiré → se reconnecter |
+| Écran noir | `flutter clean && flutter pub get && flutter run` |
+| IP change | Relancer `ipconfig` et mettre à jour `constants.dart` |
+| Camera QR ne fonctionne pas | Vérifier permission caméra dans `AndroidManifest.xml` |
 
 ---
 
 ## 📝 Notes PFE
-
 - Backend partagé avec l'application web React
 - Même base de données MySQL `port_tracking`
 - Même JWT token — un seul backend pour web + mobile
-- Application testée sur **Android API 36 (Pixel 8 Pro)**
+- Application testée sur Android 8.1 (OPPO CPH1803)
+- Logo PORTNET intégré
