@@ -22,7 +22,7 @@ class AuthProvider extends ChangeNotifier {
       _status = AuthStatus.authenticated;
       notifyListeners();
     } catch (e) {
-      _error = 'Email ou mot de passe incorrect';
+      _error = e.toString(); // ← affiche l'erreur exacte
       _status = AuthStatus.unauthenticated;
       notifyListeners();
     }
@@ -36,7 +36,6 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<void> checkAuth() async {
-    // Always start unauthenticated — require fresh login every app start
     await AuthStorage.deleteToken();
     _user = null;
     _status = AuthStatus.unauthenticated;

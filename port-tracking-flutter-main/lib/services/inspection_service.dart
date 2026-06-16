@@ -11,11 +11,14 @@ class InspectionService {
 
   static Future<List<Inspection>> getMesTaches(int inspecteurId) async {
     final response = await ApiClient.dio.get(
-      '/api/inspections/mes-taches?inspecteurId=$inspecteurId',
+      '/api/inspections/mes-taches',
+      queryParameters: {'inspecteurId': inspecteurId},
     );
-    return (response.data as List)
-        .map((json) => Inspection.fromJson(json))
-        .toList();
+    final data = response.data;
+    if (data is List) {
+      return data.map((json) => Inspection.fromJson(json)).toList();
+    }
+    return [Inspection.fromJson(data)];
   }
 
   static Future<Inspection> getInspectionById(int id) async {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/notification_provider.dart';
 import '../../widgets/app_drawer.dart';
@@ -30,9 +31,13 @@ class _NotificationListScreenState extends State<NotificationListScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: true,
         title: const Text('Notifications',
             style: TextStyle(fontWeight: FontWeight.bold)),
+        // ✅ Bouton retour vers dashboard
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.go('/dashboard'),
+        ),
         actions: [
           if (unread > 0)
             TextButton(
@@ -105,7 +110,9 @@ class _NotificationListScreenState extends State<NotificationListScreen> {
               ),
               subtitle: n.createdAt != null
                   ? Text(
-                n.createdAt!.substring(0, 16).replaceAll('T', ' '),
+                n.createdAt!
+                    .substring(0, 16)
+                    .replaceAll('T', ' '),
                 style: const TextStyle(fontSize: 11),
               )
                   : null,
@@ -115,7 +122,8 @@ class _NotificationListScreenState extends State<NotificationListScreen> {
                 child: const Text('Lu',
                     style: TextStyle(fontSize: 12)),
               )
-                  : null,
+                  : const Icon(Icons.check_circle,
+                  color: Color(0xFF16A34A), size: 18),
             ),
           );
         },

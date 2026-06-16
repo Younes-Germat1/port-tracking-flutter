@@ -40,7 +40,10 @@ class _FicheListScreenState extends State<FicheListScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.go('/dashboard'),
+        ),
         title: const Text('Fiches Suiveuses',
             style: TextStyle(fontWeight: FontWeight.bold)),
         actions: [
@@ -110,7 +113,8 @@ class _FicheListScreenState extends State<FicheListScreen> {
                 ),
                 title: Text(
                   f.importateurNom ?? 'Importateur',
-                  style: const TextStyle(fontWeight: FontWeight.w600),
+                  style: const TextStyle(
+                      fontWeight: FontWeight.w600),
                 ),
                 subtitle: Text(
                   f.createdAt?.substring(0, 10) ?? '',

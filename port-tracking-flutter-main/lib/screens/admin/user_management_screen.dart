@@ -51,29 +51,41 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
             const Text('Créer Utilisateur',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
-            TextField(controller: _nomCtrl,
+            TextField(
+                controller: _nomCtrl,
                 decoration: const InputDecoration(labelText: 'Nom')),
             const SizedBox(height: 10),
-            TextField(controller: _emailCtrl,
+            TextField(
+                controller: _emailCtrl,
                 decoration: const InputDecoration(labelText: 'Email')),
             const SizedBox(height: 10),
-            TextField(controller: _passwordCtrl, obscureText: true,
-                decoration: const InputDecoration(labelText: 'Mot de passe')),
+            TextField(
+                controller: _passwordCtrl,
+                obscureText: true,
+                decoration:
+                const InputDecoration(labelText: 'Mot de passe')),
             const SizedBox(height: 10),
             DropdownButtonFormField<String>(
               value: _role,
               decoration: const InputDecoration(labelText: 'Rôle'),
-              items: ['IMPORTATEUR', 'ADII', 'OPERATEUR', 'INSPECTEUR', 'ADMIN']
-                  .map((r) => DropdownMenuItem(value: r, child: Text(r)))
+              items: [
+                'IMPORTATEUR',
+                'ADII',
+                'OPERATEUR',
+                'INSPECTEUR',
+                'ADMIN'
+              ]
+                  .map((r) =>
+                  DropdownMenuItem(value: r, child: Text(r)))
                   .toList(),
-              onChanged: (v) => setState(() => _role = v ?? 'IMPORTATEUR'),
+              onChanged: (v) =>
+                  setState(() => _role = v ?? 'IMPORTATEUR'),
             ),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () async {
-                await UserService.createUser(
-                    _nomCtrl.text, _emailCtrl.text,
-                    _passwordCtrl.text, _role);
+                await UserService.createUser(_nomCtrl.text,
+                    _emailCtrl.text, _passwordCtrl.text, _role);
                 Navigator.of(modalContext).pop();
                 _nomCtrl.clear();
                 _emailCtrl.clear();
@@ -103,7 +115,11 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: true,
+        // ✅ Bouton retour
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.go('/dashboard'),
+        ),
         title: const Text('Utilisateurs',
             style: TextStyle(fontWeight: FontWeight.bold)),
       ),
@@ -127,7 +143,8 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
               margin: const EdgeInsets.only(bottom: 10),
               child: ListTile(
                 leading: CircleAvatar(
-                  backgroundColor: _roleColor(u.role).withOpacity(0.15),
+                  backgroundColor:
+                  _roleColor(u.role).withOpacity(0.15),
                   child: Text(
                     u.nom[0].toUpperCase(),
                     style: TextStyle(
@@ -136,7 +153,8 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                   ),
                 ),
                 title: Text(u.nom,
-                    style: const TextStyle(fontWeight: FontWeight.w600)),
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w600)),
                 subtitle: Text(u.email,
                     style: const TextStyle(fontSize: 12)),
                 trailing: Container(

@@ -55,7 +55,8 @@ class _InspectionListScreenState extends State<InspectionListScreen> {
         _fiches = allFiches;
         try {
           final users = await UserService.getAllUsers();
-          _inspecteurs = users.where((u) => u.role == 'INSPECTEUR').toList();
+          _inspecteurs =
+              users.where((u) => u.role == 'INSPECTEUR').toList();
         } catch (e) {
           print('DEBUG users error: $e');
         }
@@ -70,7 +71,8 @@ class _InspectionListScreenState extends State<InspectionListScreen> {
   Future<void> _createInspection() async {
     if (_selectedConteneurId == null || _selectedInspecteurId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Veuillez sélectionner tous les champs')),
+        const SnackBar(
+            content: Text('Veuillez sélectionner tous les champs')),
       );
       return;
     }
@@ -94,7 +96,8 @@ class _InspectionListScreenState extends State<InspectionListScreen> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const Text('Enregistrer Résultat',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                style:
+                TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
             TextField(
               controller: _commentCtrl,
@@ -161,7 +164,11 @@ class _InspectionListScreenState extends State<InspectionListScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: true,
+        // ✅ Bouton retour
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.go('/dashboard'),
+        ),
         title: const Text('Inspections',
             style: TextStyle(fontWeight: FontWeight.bold)),
       ),
@@ -180,10 +187,11 @@ class _InspectionListScreenState extends State<InspectionListScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text('Créer une Inspection',
-                          style: TextStyle(fontWeight: FontWeight.bold)),
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold)),
                       TextButton.icon(
-                        onPressed: () => setState(
-                                () => _showCreateForm = !_showCreateForm),
+                        onPressed: () => setState(() =>
+                        _showCreateForm = !_showCreateForm),
                         icon: Icon(_showCreateForm
                             ? Icons.close
                             : Icons.add),
@@ -197,8 +205,8 @@ class _InspectionListScreenState extends State<InspectionListScreen> {
                     const SizedBox(height: 12),
                     DropdownButtonFormField<int>(
                       value: _selectedFicheId,
-                      decoration:
-                      const InputDecoration(labelText: 'Fiche'),
+                      decoration: const InputDecoration(
+                          labelText: 'Fiche'),
                       items: _fiches
                           .map((f) => DropdownMenuItem(
                         value: f.id,
@@ -226,11 +234,12 @@ class _InspectionListScreenState extends State<InspectionListScreen> {
                       items: _conteneurs
                           .map((c) => DropdownMenuItem(
                         value: c.id,
-                        child: Text('Conteneur #${c.id}'),
+                        child:
+                        Text('Conteneur #${c.id}'),
                       ))
                           .toList(),
-                      onChanged: (v) =>
-                          setState(() => _selectedConteneurId = v),
+                      onChanged: (v) => setState(
+                              () => _selectedConteneurId = v),
                     ),
                     const SizedBox(height: 8),
                     DropdownButtonFormField<int>(
@@ -243,8 +252,8 @@ class _InspectionListScreenState extends State<InspectionListScreen> {
                         child: Text(u.nom),
                       ))
                           .toList(),
-                      onChanged: (v) =>
-                          setState(() => _selectedInspecteurId = v),
+                      onChanged: (v) => setState(
+                              () => _selectedInspecteurId = v),
                     ),
                     const SizedBox(height: 8),
                     DropdownButtonFormField<String>(
@@ -255,15 +264,16 @@ class _InspectionListScreenState extends State<InspectionListScreen> {
                           .map((o) => DropdownMenuItem(
                           value: o, child: Text(o)))
                           .toList(),
-                      onChanged: (v) =>
-                          setState(() => _organisme = v ?? 'ADII'),
+                      onChanged: (v) => setState(
+                              () => _organisme = v ?? 'ADII'),
                     ),
                     const SizedBox(height: 12),
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: _createInspection,
-                        child: const Text("Créer l'Inspection"),
+                        child:
+                        const Text("Créer l'Inspection"),
                       ),
                     ),
                   ],
@@ -275,36 +285,45 @@ class _InspectionListScreenState extends State<InspectionListScreen> {
             child: _inspections.isEmpty
                 ? const Center(
                 child: Text('Aucune inspection',
-                    style: TextStyle(color: Color(0xFF9CA3AF))))
+                    style: TextStyle(
+                        color: Color(0xFF9CA3AF))))
                 : ListView.builder(
               padding: const EdgeInsets.all(16),
               itemCount: _inspections.length,
               itemBuilder: (_, i) {
                 final ins = _inspections[i];
                 return Card(
-                  margin: const EdgeInsets.only(bottom: 10),
+                  margin:
+                  const EdgeInsets.only(bottom: 10),
                   child: ListTile(
-                    onTap: () => GoRouter.of(context).push('/inspections/${ins.id}'),
+                    onTap: () => GoRouter.of(context)
+                        .push('/inspections/${ins.id}'),
                     leading: CircleAvatar(
-                      backgroundColor: const Color(0xFFEFF6FF),
+                      backgroundColor:
+                      const Color(0xFFEFF6FF),
                       child: Text('#${ins.id}',
                           style: const TextStyle(
                               color: Color(0xFF2563EB),
                               fontSize: 11,
-                              fontWeight: FontWeight.bold)),
+                              fontWeight:
+                              FontWeight.bold)),
                     ),
                     title: Text(
                         'Conteneur #${ins.conteneurId}  •  ${ins.organisme ?? '-'}'),
                     subtitle: Text(
-                        ins.date?.substring(0, 10) ?? ''),
+                        ins.date?.substring(0, 10) ??
+                            ''),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 4),
+                          padding:
+                          const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4),
                           decoration: BoxDecoration(
-                            color: _resultatColor(ins.resultat)
+                            color: _resultatColor(
+                                ins.resultat)
                                 .withOpacity(0.1),
                             borderRadius:
                             BorderRadius.circular(8),
@@ -312,7 +331,8 @@ class _InspectionListScreenState extends State<InspectionListScreen> {
                           child: Text(
                             _resultatLabel(ins.resultat),
                             style: TextStyle(
-                              color: _resultatColor(ins.resultat),
+                              color: _resultatColor(
+                                  ins.resultat),
                               fontSize: 11,
                               fontWeight: FontWeight.w600,
                             ),

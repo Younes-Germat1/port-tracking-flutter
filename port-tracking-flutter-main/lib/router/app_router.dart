@@ -12,6 +12,7 @@ import '../screens/inspections/inspection_list_screen.dart';
 import '../screens/inspections/inspection_detail_screen.dart';
 import '../screens/notifications/notification_list_screen.dart';
 import '../screens/admin/user_management_screen.dart';
+import '../screens/qr/qr_scanner_screen.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -80,6 +81,11 @@ GoRouter createRouter(AuthProvider authProvider) {
       GoRoute(
         path: '/admin/users',
         builder: (context, state) => const UserManagementScreen(),
+      ),
+      // ✅ QR Scanner
+      GoRoute(
+        path: '/qr-scanner',
+        builder: (context, state) => const QrScannerScreen(),
       ),
     ],
   );

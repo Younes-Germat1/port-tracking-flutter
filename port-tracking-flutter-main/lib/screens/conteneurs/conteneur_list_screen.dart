@@ -62,7 +62,10 @@ class _ConteneurListScreenState extends State<ConteneurListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.go('/dashboard'),
+        ),
         title: const Text('Conteneurs',
             style: TextStyle(fontWeight: FontWeight.bold)),
       ),
@@ -71,7 +74,6 @@ class _ConteneurListScreenState extends State<ConteneurListScreen> {
           ? const Center(child: CircularProgressIndicator())
           : Column(
         children: [
-          // Fiche selector
           Container(
             padding: const EdgeInsets.all(16),
             color: Colors.white,
@@ -93,8 +95,6 @@ class _ConteneurListScreenState extends State<ConteneurListScreen> {
               },
             ),
           ),
-
-          // Conteneurs list
           Expanded(
             child: _selectedFicheId == null
                 ? const Center(
@@ -105,7 +105,8 @@ class _ConteneurListScreenState extends State<ConteneurListScreen> {
                       size: 64, color: Color(0xFFD1D5DB)),
                   SizedBox(height: 16),
                   Text('Sélectionnez une fiche',
-                      style: TextStyle(color: Color(0xFF9CA3AF))),
+                      style:
+                      TextStyle(color: Color(0xFF9CA3AF))),
                 ],
               ),
             )
@@ -114,8 +115,8 @@ class _ConteneurListScreenState extends State<ConteneurListScreen> {
                 : _conteneurs.isEmpty
                 ? const Center(
               child: Text('Aucun conteneur',
-                  style:
-                  TextStyle(color: Color(0xFF9CA3AF))),
+                  style: TextStyle(
+                      color: Color(0xFF9CA3AF))),
             )
                 : ListView.builder(
               padding: const EdgeInsets.all(16),
@@ -123,7 +124,8 @@ class _ConteneurListScreenState extends State<ConteneurListScreen> {
               itemBuilder: (_, i) {
                 final c = _conteneurs[i];
                 return Card(
-                  margin: const EdgeInsets.only(bottom: 10),
+                  margin:
+                  const EdgeInsets.only(bottom: 10),
                   child: ListTile(
                     onTap: () => context
                         .go('/conteneurs/${c.id}'),
@@ -134,15 +136,18 @@ class _ConteneurListScreenState extends State<ConteneurListScreen> {
                           style: const TextStyle(
                               color: Color(0xFF2563EB),
                               fontSize: 11,
-                              fontWeight: FontWeight.bold)),
+                              fontWeight:
+                              FontWeight.bold)),
                     ),
                     title: Text(
                         'Zone: ${c.zone ?? '-'} | Rangée: ${c.rangee ?? '-'}'),
                     subtitle: Text(
                         'Position: ${c.position ?? '-'} | Quai: ${c.quai ?? '-'}'),
                     trailing: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
+                      padding:
+                      const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4),
                       decoration: BoxDecoration(
                         color: _statutColor(c.statut)
                             .withOpacity(0.1),
@@ -152,7 +157,8 @@ class _ConteneurListScreenState extends State<ConteneurListScreen> {
                       child: Text(
                         c.statut,
                         style: TextStyle(
-                          color: _statutColor(c.statut),
+                          color:
+                          _statutColor(c.statut),
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
                         ),

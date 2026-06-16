@@ -1,10 +1,10 @@
 class AppConstants {
-  static const String baseUrl = 'http://localhost:8080';  // For real device use your PC's IP: http://192.168.x.x:8080
+  static const String baseUrl = 'http://192.168.0.183:8080';
 
+  static const String loginEndpoint = '/api/auth/login';
   static const String tokenKey = 'jwt_token';
   static const String userKey = 'user_data';
 
-  // Fiche statuts
   static const String enAttente = 'EN_ATTENTE';
   static const String approuvee = 'APPROUVEE';
   static const String rejetee = 'REJETEE';
@@ -12,7 +12,6 @@ class AppConstants {
   static const String dedouanee = 'DEDOUANEE';
   static const String liberee = 'LIBEREE';
 
-  // User roles
   static const String admin = 'ADMIN';
   static const String importateur = 'IMPORTATEUR';
   static const String adii = 'ADII';
